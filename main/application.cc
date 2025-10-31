@@ -420,9 +420,22 @@ void Application::Start() {
         xEventGroupSetBits(event_group_, MAIN_EVENT_ERROR);
     });
     protocol_->OnIncomingAudio([this](std::unique_ptr<AudioStreamPacket> packet) {
-        if (device_state_ == kDeviceStateSpeaking) {
+        Schedule([this, packet = std::move(packet)]() mutable {
+            if (device_state_ != kDeviceStateSpeaking) {
+                switch (device_state_) {
+                    case kDeviceStateIdle:
+                    case kDeviceStateListening:
+                    case kDeviceStateConnecting:
+                        aborted_ = false;
+                        SetDeviceState(kDeviceStateSpeaking);
+                        break;
+                    default:
+                        return;
+                }
+            }
+
             audio_service_.PushPacketToDecodeQueue(std::move(packet));
-        }
+        });
     });
     protocol_->OnAudioChannelOpened([this, codec, &board]() {
         board.SetPowerSaveMode(false);
