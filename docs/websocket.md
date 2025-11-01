@@ -2,6 +2,11 @@
 
 该文档仅基于所提供的代码推断，实际部署时可能需要结合服务器端实现进行进一步确认或补充。
 
+### 配置服务器地址
+
+- 设备会优先读取 NVS 中 `websocket` 命名空间的 `url` 字段作为连接目标，可通过 MCP 工具 `self.server.get_websocket_url` 查看当前值，使用 `self.server.set_websocket_url` 进行更新。
+- 若 NVS 未写入该字段，则会退回到编译期的 `CONFIG_DEFAULT_WEBSOCKET_URL`（位于 `menuconfig -> Xiaozhi Assistant -> Default websocket server URL`）。若两者均为空，设备会报告“无法连接服务”。
+
 ---
 
 ## 1. 总体流程概览

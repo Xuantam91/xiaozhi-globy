@@ -6,6 +6,13 @@ config OTA_URL
     help
         The application will access this URL to check for new firmwares and server address.
 
+config DEFAULT_WEBSOCKET_URL
+    string "Default websocket server URL"
+    default ""
+    help
+        Fallback websocket URL used when no value is stored in NVS settings.
+        Example: ws://www.xiaozhishop.xyz:5005/ws
+
 choice
     prompt "Flash Assets"
     default FLASH_DEFAULT_ASSETS

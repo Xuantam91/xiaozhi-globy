@@ -9,6 +9,7 @@
 #include <esp_log.h>
 #include <arpa/inet.h>
 #include "assets/lang_config.h"
+#include "sdkconfig.h"
 
 #define TAG "WS"
 
@@ -82,6 +83,17 @@ void WebsocketProtocol::CloseAudioChannel() {
 bool WebsocketProtocol::OpenAudioChannel() {
     Settings settings("websocket", false);
     std::string url = settings.GetString("url");
+#ifdef CONFIG_DEFAULT_WEBSOCKET_URL
+    if (url.empty() && strlen(CONFIG_DEFAULT_WEBSOCKET_URL) > 0) {
+        url = CONFIG_DEFAULT_WEBSOCKET_URL;
+        ESP_LOGI(TAG, "Using default websocket URL from Kconfig: %s", url.c_str());
+    }
+#endif
+    if (url.empty()) {
+        ESP_LOGE(TAG, "Websocket URL is not configured. Update namespace 'websocket' key 'url'.");
+        SetError(Lang::Strings::SERVER_NOT_FOUND);
+        return false;
+    }
     std::string token = settings.GetString("token");
     int version = settings.GetInt("version");
     if (version != 0) {
