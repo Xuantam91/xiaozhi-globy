@@ -148,6 +148,26 @@ void McpServer::AddUserOnlyTools() {
             return true;
         });
 
+    AddUserOnlyTool("self.server.get_websocket_url",
+        "Get the websocket server URL used for streaming responses and music playback.",
+        PropertyList(),
+        [](const PropertyList& properties) -> ReturnValue {
+            Settings settings("websocket", false);
+            return settings.GetString("url");
+        });
+
+    AddUserOnlyTool("self.server.set_websocket_url",
+        "Update the websocket server URL used for streaming responses and music playback.",
+        PropertyList({
+            Property("url", kPropertyTypeString)
+        }),
+        [](const PropertyList& properties) -> ReturnValue {
+            auto url = properties["url"].value<std::string>();
+            Settings settings("websocket", true);
+            settings.SetString("url", url);
+            return true;
+        });
+
     // Firmware upgrade
     AddUserOnlyTool("self.upgrade_firmware", "Upgrade firmware from a specific URL. This will download and install the firmware, then reboot the device.",
         PropertyList({
